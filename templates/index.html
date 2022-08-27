@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Image Tagging & Road Object Detection</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/css_final.css') }}"/>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    </head>
+    <body>
+        <div id="header">
+            <div id="content">
+                <h2 style="color: maroon;">Image Tagging & Road Object Detection</h2>
+                <input type="file" id="myFile"/> &nbsp;Model: <select id="model_type"><option value="yolo5" selected>Yolo 5</option><option value="scaled_yolo4">Scaled Yolo 4</option><option value="ssd">SSD</option></select><br/><br/>
+                <button onclick="myFunction()">Detect Objects</button><br/><br/>
+                <div id="results">
+                    <img id="demo"></img>
+                    <h3>Detected Objects:</h3>
+                    <ul id="text"></ul>
+                </div>
+            </div>
+        </div>
+        <script>
+            function myFunction(){
+                var x = document.getElementById("myFile");
+                let formData = new FormData();
+
+                formData.append("file", x.files[0]);
+                formData.append("model_type", document.getElementById('model_type').value);
+                fetch('/get-detection', {method: "POST", body: formData})
+                .then((response) => {
+                    response.blob().then((blobResponse) => {
+                        data = blobResponse;
+                        const urlCreator = window.URL || window.webkitURL;
+                        document.getElementById('demo').src = urlCreator.createObjectURL(data);
+                        document.getElementById('results').style.display = 'block';
+                    });
+                });
+                fetch('/get-objects', {method: "POST", body: formData, headers: {'accept': 'application/json'}})
+                .then((response) => response.json())
+                .then((data) => {
+                    const list = document.getElementById('text');
+                    list.replaceChildren();
+                    data.result.forEach((res, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.appendChild(document.createElement('p')).innerText = `Object ${index + 1}`;
+                        const children = document.createElement('ul');
+                        children.appendChild(document.createElement('li')).innerText = `Class: ${res.name}`;
+                        children.appendChild(document.createElement('li')).innerText = `(xmin, xmax) = (${res.xmin}, ${res.xmax})`;
+                        children.appendChild(document.createElement('li')).innerText = `(ymin, ymax) = (${res.ymin}, ${res.ymax})`;
+                        children.appendChild(document.createElement('li')).innerText = `confidence = ${res.confidence}`;
+                        listItem.appendChild(children);
+                        list.append(listItem);
+                    });
+                });
+            }
+        </script>
+    </body>
+</html>
