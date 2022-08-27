@@ -13,7 +13,7 @@ def get_models():
     return models
 
 def get_yolov5():
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path='./model/best.pt')
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path='./model/yolov5.pt')
     model.conf = 0.5
     return model
 
