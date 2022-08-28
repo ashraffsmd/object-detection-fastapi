@@ -1,9 +1,6 @@
 import torch
 from PIL import Image
 import io
-import ssl
-
-ssl._create_default_https_context = ssl._create_unverified_context
 
 models = {}
 def get_models():
