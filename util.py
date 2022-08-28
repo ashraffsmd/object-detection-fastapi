@@ -5,8 +5,8 @@ import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
+models = {}
 def get_models():
-    models = {}
     models['yolo5'] = get_yolov5()
     models['scaled_yolo4'] = get_scaled_yolo4()
     models['ssd'] = get_ssd()
@@ -19,11 +19,11 @@ def get_yolov5():
 
 def get_scaled_yolo4():
     # return scaled yolo 4 model here
-    return get_yolov5()
+    return models['yolo5']
 
 def get_ssd():
     # return ssd model here
-    return get_yolov5()
+    return models['yolo5']
 
 
 def get_image_from_bytes(binary_image, max_size=1024):
