@@ -3,6 +3,9 @@ import os
 import torch
 from PIL import Image
 import io
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 import importlib.util
 import sys
