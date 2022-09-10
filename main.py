@@ -51,7 +51,7 @@ def root(request: Request) -> dict:
     )
 
 @app.post("/get-objects")
-async def detect_food_return_json_result(file: bytes = File(...), model_type: str = Form(None)):
+async def detect_json_result(file: bytes = File(...), model_type: str = Form(None)):
     input_image = get_image_from_bytes(file)
     model = models[model_type]
     if model_type == 'yolo5':
@@ -74,7 +74,7 @@ async def detect_food_return_json_result(file: bytes = File(...), model_type: st
 
 
 @app.post("/get-detection")
-async def detect_food_return_base64_img(file: bytes = File(...), model_type: str = Form(None)):
+async def detect_base64_img(file: bytes = File(...), model_type: str = Form(None)):
     input_image = get_image_from_bytes(file)
     model = models[model_type]
     if model_type == 'yolo5':

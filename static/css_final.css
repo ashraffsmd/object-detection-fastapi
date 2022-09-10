@@ -26,9 +26,14 @@ body
     display: none;
 }
 
+#detect-button {
+    display: none;
+}
+
 #error {
     color: red;
     font-size: 18px;
+    display: none;
 }
 
 .upload-area{
@@ -74,4 +79,8 @@ body
 
 #objects {
     text-align: center;
+}
+
+#objects th {
+    color: #3e19fa;
 }

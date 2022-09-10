@@ -10,7 +10,7 @@
             <div id="content">
                 <h1 style="color: maroon;">Image Tagging & Road Object Detection</h1>
                 <input type="file" id="myFile"/>
-                <span style="font-size: 20px;">Select a Model: </span><select id="model_type"><option value="yolo5" selected>Yolo 5</option><option value="scaled_yolo4">Scaled Yolo 4</option><option value="ssd" disabled>SSD</option></select><button style="margin-left:25px;" onclick="myFunction()">Detect Objects</button><br/><br/>
+                <span style="font-size: 20px;">Select a Model: </span><select id="model_type"><option value="yolo5" selected>Yolo 5</option><option value="scaled_yolo4">Scaled Yolo 4</option><option value="ssd" disabled>SSD</option></select><button id="detect-button" style="margin-left:25px;" onclick="myFunction()">Detect Objects</button><br/><br/>
                 <div id="messages">
                     <span id="error">Please drop / select a model below.</span>
                 </div>
@@ -18,6 +18,7 @@
                     <span id="drop-text">Drag and Drop here<br/>Or<br/>Click to select</span>
                 </div>
                 <div id="results">
+                    <span id="time" style="font-size: 18px;"></span><br/><br/>
                     <img id="demo"></img>
                     <div id="objects-container">
                         <h2>Detected Objects</h2>
@@ -33,9 +34,11 @@
                 var x = document.getElementById("myFile");
                 if (!x.files.length) {
                     $('#error').show();
+                    $('#detect-button').hide();
                     return;
                 } else {
                     $('#error').hide();
+                    $('#detect-button').show();
                 }
                 let formData = fd || new FormData();
 
@@ -43,6 +46,9 @@
                     formData.append("file", x.files[0]);
                 }
                 formData.append("model_type", document.getElementById('model_type').value);
+
+                var startTime = new Date(), endTime, finished = false;
+
                 fetch('/get-detection', {method: "POST", body: formData})
                 .then((response) => {
                     response.blob().then((blobResponse) => {
@@ -50,6 +56,14 @@
                         const urlCreator = window.URL || window.webkitURL;
                         document.getElementById('demo').src = urlCreator.createObjectURL(data);
                         document.getElementById('results').style.display = 'block';
+                        if (!finished) {
+                            finished = true;
+                        } else {
+                            endTime = new Date();
+                            var timeDiff = (endTime - startTime) / 1000
+                            var seconds = timeDiff.toFixed(6);
+                            $('#time').text("Inference time (in seconds): " + seconds);
+                        }
                     });
                 });
                 fetch('/get-objects', {method: "POST", body: formData, headers: {'accept': 'application/json'}})
@@ -65,6 +79,14 @@
                     });
                     table.rows.add(dataset).draw();
                     $('#drop-text').text("Drop / Select another image");
+                    if (!finished) {
+                        finished = true;
+                    } else {
+                        endTime = new Date();
+                        var timeDiff = (endTime - startTime) / 1000
+                        var seconds = timeDiff.toFixed(6);
+                        $('#time').text("Inference time (in seconds): " + seconds);
+                    }
                 });
             }
             $(document).ready(function () {
