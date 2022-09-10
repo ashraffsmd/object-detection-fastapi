@@ -1,230 +1,77 @@
 body
 {
     background: #e6e6e6 url('wood.jpg')repeat;
-    height: 970px;
-    width: 970px;
 }
 
-    #header {
-        position: absolute;
-        left: 40px;
-        right: 40px;
-        top: 10px;
-        border: 1px dotted black;
-        background: rgba(127,191,127,0.45);
-        padding: 15px;
-     }
-
-    #content {
-        margin: 40px;
-        border: 1px dotted black;
-        background: rgba(255,255,255,0.8);
-        text-align: center;
-        height: 100%;
-        padding: 20px;
+#header {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    top: 10px;
+    border: 1px dotted black;
+    background: rgba(127,191,127,0.45);
+    padding: 15px;
     }
 
-    #results {
-        display: none;
-    }
+#content {
+    margin: 40px;
+    border: 1px dotted black;
+    background: rgba(255,255,255,0.8);
+    text-align: center;
+    height: 100%;
+    padding: 20px;
+}
 
-    #results > h3 {
-        padding-left: 20px;
-        text-align: left;
-    }
+#myFile {
+    display: none;
+}
 
-    #results > ul {
-        text-align: left;
-        list-style-type: none;
-        padding-left: 20px;
-    }
-        #logo
-        {
-           margin-left:20px;
-           margin-top:20px;
-        }
+#error {
+    color: red;
+    font-size: 18px;
+}
 
-        #welcome
-        {
-           position:absolute;
-           right:20px;
-           top:-20px;
-           font-family:"sylfaen";
-           font-size:40px;
-           color:#eee5e5;
-           font-weight:bold;
-        }
+.upload-area{
+    width: 70%;
+    height: 200px;
+    border: 2px solid lightgray;
+    border-radius: 3px;
+    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-        #nav1
-        {
-           margin-top:10px;
-        }
+.upload-area:hover{
+    cursor: pointer;
+}
 
-        #ulist1
-        {
-           list-style-type:none;
-           margin:0;
-           padding:0;
-           overflow:hidden;
-        }
-            .list1
-            {
-               float:left;
-            }
-                a.link1:link,a.link1:visited
-                {
-                   display:block;
-                   width:150px;
-                   font-weight:bold;
-                   color:white;
-                   background-color:#400000;
-                   color:white;
-                   border-right:1px dotted #ededed;
-                   text-align:center;
-                   padding:4px;
-                   text-decoration:none;
-                   text-transform:uppercase;
-                }
+#drop-text{
+    text-align: center;
+    font-weight: normal;
+    font-family: sans-serif;
+    font-size: 28px;
+    line-height: normal;
+    color: darkslategray;
+}
 
-                a.link1:hover,a.link1:active
-                {
-                   background-color:#c1c1c1;
-                   color:maroon;
-                }
+#results {
+    display: none;
+}
 
-        #searchbox
-        {
-           position:absolute;
-           right:20px;
-           top:110px;
-        }
-    #leftcol
-    {
-       position:absolute;
-       left:40px;
-       top:170px;
-       float:left;
-       width:305px;
-       height:675px;
-       border:1px dotted black;
-       background:rgba(127,191,127,0.45);
-    }
-        #navigation
-        {
-            margin-top:10px;
-            font-weight:bold;
-            color:maroon;
-            background-color:#dadada;
-            text-align:center;
-            height:30px;
-        }
+#objects-container {
+    margin: 0 auto;
+    width: 75%;
+}
 
-        #nav2
-        {
-           text-align:center;
-           
-           margin-top:10px;
-        }
+#objects-container > h2 {
+    text-decoration: underline;
+}
 
-        #ulist2
-        {
-           list-style-type:none;
-           margin:0;
-           padding:0;
-           overflow:hidden;
-        }
-            .list2
-            {
-               float:none;
-            }
-                a.link2:link,a.link2:visited
-                {
-                   display:block;
-                   height:30px;
-                   width:317px;
-                   font-weight:bold;
-                   color:blue;
-                   background-color:#dadada;
-                   border-bottom:1px dotted #ededed;
-                   text-align:center;
-                   padding:4px;
-                   text-decoration:none;
-                   text-transform:uppercase;
-                }
-
-                a.link2:hover,a.link2:active
-                {
-                   background-color:#660000;
-                   color:white;
-                }
-
-        #add
-        {
-           margin:40px;
-           border:1px dotted black;
-           background:rgba(255,255,255,0.8);
-           text-align:center;
-           height:200px;
-        }
-        #p1
-        {
-           margin:70px;
-           font-weight:bold;
-        }
-    #rightcol,#rightcols,#rightcole
-    {
-       position:absolute;
-       left:370px;
-       top:172px;
-       float:left;
-       width:850px;
-       height:674px;
-       border:1px dotted black;
-       background:rgba(255,255,255,0.97);
-    }
-    #rightcols,#rightcole
-    {
-       overflow:scroll;
-    }
-        #p2,#p3,#p4
-        {
-           margin-left:10px;
-           margin-top:20px;
-           font:Times new roman;
-           font-size:18px;
-        }
-
-        #image
-        {
-           position:absolute;
-           top:50px;
-           left:630px;
-        }
-        #table1
-        {
-           margin:10px;
-           width:500px;
-           text-align:center;
-           color:black;
-           font-weight:bold;
-        }
-        th
-        {
-           color:blue;
-           font-weight:bold;
-        }
-
-    #footer
-    {
-       height:80px;
-       position:absolute;
-       bottom:-300px;
-       left:40px;
-       right:40px;
-       padding-left:20px;
-       background-color:black;
-       color:white;
-       font-weight:bold;
-       font-family:"comic sans";
-       background:rgba(127,191,127,0.45);
-    }
+#objects {
+    text-align: center;
+}

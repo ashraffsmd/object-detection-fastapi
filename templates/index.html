@@ -3,27 +3,45 @@
     <head>
         <title>Image Tagging & Road Object Detection</title>
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='/css_final.css') }}"/>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-html5-2.2.3/b-print-2.2.3/datatables.min.css"/>
     </head>
     <body>
         <div id="header">
             <div id="content">
-                <h2 style="color: maroon;">Image Tagging & Road Object Detection</h2>
-                <input type="file" id="myFile"/> &nbsp;Model: <select id="model_type"><option value="yolo5" selected>Yolo 5</option><option value="scaled_yolo4">Scaled Yolo 4</option><option value="ssd">SSD</option></select><br/><br/>
-                <button onclick="myFunction()">Detect Objects</button><br/><br/>
+                <h1 style="color: maroon;">Image Tagging & Road Object Detection</h1>
+                <input type="file" id="myFile"/>
+                <span style="font-size: 20px;">Select a Model: </span><select id="model_type"><option value="yolo5" selected>Yolo 5</option><option value="scaled_yolo4">Scaled Yolo 4</option><option value="ssd" disabled>SSD</option></select><button style="margin-left:25px;" onclick="myFunction()">Detect Objects</button><br/><br/>
+                <div id="messages">
+                    <span id="error">Please drop / select a model below.</span>
+                </div>
+                <div class="upload-area"  id="uploadfile">
+                    <span id="drop-text">Drag and Drop here<br/>Or<br/>Click to select</span>
+                </div>
                 <div id="results">
                     <img id="demo"></img>
-                    <h3>Detected Objects:</h3>
-                    <ul id="text"></ul>
+                    <div id="objects-container">
+                        <h2>Detected Objects</h2>
+                        <table id="objects" class="display cell-border"></table>
+                    </div>
                 </div>
             </div>
         </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <script>
-            function myFunction(){
+            var table;
+            function myFunction(fd){
                 var x = document.getElementById("myFile");
-                let formData = new FormData();
+                if (!x.files.length) {
+                    $('#error').show();
+                    return;
+                } else {
+                    $('#error').hide();
+                }
+                let formData = fd || new FormData();
 
-                formData.append("file", x.files[0]);
+                if (!fd) {
+                    formData.append("file", x.files[0]);
+                }
                 formData.append("model_type", document.getElementById('model_type').value);
                 fetch('/get-detection', {method: "POST", body: formData})
                 .then((response) => {
@@ -37,21 +55,99 @@
                 fetch('/get-objects', {method: "POST", body: formData, headers: {'accept': 'application/json'}})
                 .then((response) => response.json())
                 .then((data) => {
-                    const list = document.getElementById('text');
-                    list.replaceChildren();
+                    if (table.rows().count() !== 0) {
+                        table.clear();
+                    }
+                    const dataset = [];
                     data.result.forEach((res, index) => {
-                        const listItem = document.createElement('li');
-                        listItem.appendChild(document.createElement('p')).innerText = `Object ${index + 1}`;
-                        const children = document.createElement('ul');
-                        children.appendChild(document.createElement('li')).innerText = `Class: ${res.name}`;
-                        children.appendChild(document.createElement('li')).innerText = `(xmin, xmax) = (${res.xmin}, ${res.xmax})`;
-                        children.appendChild(document.createElement('li')).innerText = `(ymin, ymax) = (${res.ymin}, ${res.ymax})`;
-                        children.appendChild(document.createElement('li')).innerText = `confidence = ${res.confidence}`;
-                        listItem.appendChild(children);
-                        list.append(listItem);
+                        const rowData = [res.name, res.xmin, res.xmax, res.ymin, res.ymax, res.confidence.toFixed(2)]
+                        dataset.push(rowData);
                     });
+                    table.rows.add(dataset).draw();
+                    $('#drop-text').text("Drop / Select another image");
                 });
             }
+            $(document).ready(function () {
+                table = $('#objects').DataTable({
+                    info: false,
+                    ordering: false,
+                    paging: false,
+                    searching: false,
+                    columns: [
+                        { title: 'Object' },
+                        { title: 'xmin' },
+                        { title: 'xmax' },
+                        { title: 'ymin' },
+                        { title: 'ymax' },
+                        { title: 'Confidence' },
+                    ],
+                    columnDefs: [{
+                        targets: '_all',
+                        className: 'dt-head-center'
+                    }],
+                    dom: '<"export-buttons"B>t',
+                    buttons: [
+                        'copy', 'csv', 'excel', 'pdf', 'print'
+                    ]
+                });
+                $(function() {
+                    // preventing page from redirecting
+                    $("html").on("dragover", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        $('#drop-text').text("Drag here");
+                    });
+
+                    $("html").on("drop", function(e) { e.preventDefault(); e.stopPropagation(); });
+                    $('#error').hide();
+
+                    // Drag enter
+                    $('.upload-area').on('dragenter', function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        $('#drop-text').text("Drop");
+                    });
+
+                    // Drag over
+                    $('.upload-area').on('dragover', function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        $('#drop-text').text("Drop");
+                    });
+
+                    // Drop
+                    $('.upload-area').on('drop', function (e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+
+                        var file = e.originalEvent.dataTransfer.files;
+                        var fd = new FormData();
+
+                        fd.append('file', file[0]);
+
+                        myFunction(fd);
+                    });
+
+                    // Open file selector on div click
+                    $("#uploadfile").click(function(){
+                        $("#myFile").click();
+                    });
+
+                    // file selected
+                    $("#myFile").change(function(){
+                        var fd = new FormData();
+
+                        var files = $('#myFile')[0].files[0];
+
+                        fd.append('file',files);
+
+                        myFunction(fd);
+                    });
+                });
+            });
         </script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.12.1/b-2.2.3/b-html5-2.2.3/b-print-2.2.3/datatables.min.js"></script>
     </body>
 </html>
