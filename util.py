@@ -1,6 +1,20 @@
+import os
+
 import torch
 from PIL import Image
 import io
+
+import importlib.util
+import sys
+
+def lazy_import(name):
+    spec = importlib.util.find_spec(name)
+    loader = importlib.util.LazyLoader(spec.loader)
+    spec.loader = loader
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    loader.exec_module(module)
+    return module
 
 models = {}
 def get_models():
@@ -15,8 +29,23 @@ def get_yolov5():
     return model
 
 def get_scaled_yolo4():
-    # return scaled yolo 4 model here
-    return models['yolo5']
+    from ScaledYOLOv4.models import experimental
+    from ScaledYOLOv4.utils import torch_utils
+    from ScaledYOLOv4.models import common, yolo
+
+    common_orig = sys.modules["models.common"]
+    yolo_orig = sys.modules["models.yolo"]
+
+    # needed for unpickling
+    sys.modules["models.common"] = common
+    sys.modules["models.yolo"] = yolo
+    device = torch_utils.select_device("cpu")
+    model = experimental.attempt_load("./model/scaled_yolov4.pt", device)
+
+    sys.modules["models.common"] = common_orig
+    sys.modules["models.yolo"] = yolo_orig
+
+    return model
 
 def get_ssd():
     # return ssd model here

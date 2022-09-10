@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI, File, Request, Form
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
@@ -49,7 +51,7 @@ def root(request: Request) -> dict:
     )
 
 @app.post("/get-objects")
-async def detect_food_return_json_result(file: bytes = File(...), model_type: str = Form()):
+async def detect_food_return_json_result(file: bytes = File(...), model_type: str = Form(None)):
     input_image = get_image_from_bytes(file)
     model = models[model_type]
     if model_type == 'yolo5':
@@ -58,9 +60,11 @@ async def detect_food_return_json_result(file: bytes = File(...), model_type: st
         detect_res = json.loads(detect_res)
         return {"result": detect_res}
     elif model_type == 'scaled_yolo4':
-        results = model(input_image)
-        detect_res = results.pandas().xyxy[0].to_json(orient="records")  # JSON img1 predictions
-        detect_res = json.loads(detect_res)
+        from ScaledYOLOv4 import detect
+        from ScaledYOLOv4.utils import torch_utils
+        device = torch_utils.select_device("cpu")
+        detect_res = detect.getPredictions(model, input_image, device)
+        detect_res = json.loads(json.dumps(detect_res))
         return {"result": detect_res}
     elif model_type == 'ssd':
         results = model(input_image)
@@ -70,7 +74,7 @@ async def detect_food_return_json_result(file: bytes = File(...), model_type: st
 
 
 @app.post("/get-detection")
-async def detect_food_return_base64_img(file: bytes = File(...), model_type: str = Form()):
+async def detect_food_return_base64_img(file: bytes = File(...), model_type: str = Form(None)):
     input_image = get_image_from_bytes(file)
     model = models[model_type]
     if model_type == 'yolo5':
@@ -82,8 +86,12 @@ async def detect_food_return_base64_img(file: bytes = File(...), model_type: str
             img_base64.save(bytes_io, format="jpeg")
         return Response(content=bytes_io.getvalue(), media_type="image/jpeg")
     elif model_type == 'scaled_yolo4':
-        results = model(input_image)
-        ims = results.render()  # Return images with boxes and labels
+        from ScaledYOLOv4 import detect
+        from ScaledYOLOv4.utils import torch_utils
+        device = torch_utils.select_device("cpu")
+
+        ims = detect.detectImage(model, input_image, device)
+
         for img in ims:
             bytes_io = io.BytesIO()
             img_base64 = Image.fromarray(img)
