@@ -43,7 +43,7 @@ def get_scaled_yolo4():
     sys.modules["models.common"] = common
     sys.modules["models.yolo"] = yolo
     device = torch_utils.select_device("cpu")
-    model = experimental.attempt_load("./model/scaled_yolov4.pt", device)
+    model = experimental.attempt_load("./model/scaled_yolov4.pt", device, True)
 
     sys.modules["models.common"] = common_orig
     sys.modules["models.yolo"] = yolo_orig
