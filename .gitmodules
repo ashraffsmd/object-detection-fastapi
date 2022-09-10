@@ -1,0 +1,4 @@
+[submodule "ScaledYOLOv4"]
+	path = ScaledYOLOv4
+	url = https://github.com/linux-admirer/ScaledYOLOv4.git
+	branch = YOLOv4_BDD
